@@ -1,4 +1,5 @@
 ﻿using DisCatSharp;
+using DisCatSharp.ApplicationCommands;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using Microsoft.Extensions.Configuration;
@@ -28,9 +29,9 @@ var client = new DiscordClient(new() {
 
 var spamManager = new SpamManager(client, config);
 
+client.UseApplicationCommands()
+    .RegisterGlobalCommands<ServerManagementModule>();
 
-await client.ConnectAsync();
-// TODO: Emoji doesn't seem to work.
-await client.UpdateStatusAsync(new("", ActivityType.Custom) { Name = "PARSING", Emoji = new("💾") });
+await client.ConnectAsync(new("", ActivityType.Custom) { Name = "💾 PARSING" });
 
 await spamManager.StartCleanup();

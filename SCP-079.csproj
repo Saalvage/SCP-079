@@ -9,7 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="DisCatSharp" Version="10.7.0" />
+      <PackageReference Include="DisCatSharp" Version="10.7.1-nightly-025" />
+      <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.7.1-nightly-025" />
       <PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="6.2.5">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

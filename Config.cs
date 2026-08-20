@@ -5,5 +5,4 @@ public class Config {
     public int SpamMinMessages { get; init; }
     public int SpamMaxTimeSeconds { get; init; }
     public int SpamTimeoutMinutes { get; init; }
-    public IReadOnlyDictionary<ulong, ulong> LogChannelsPerServer { get; init; }
 }

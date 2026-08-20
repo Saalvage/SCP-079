@@ -43,6 +43,8 @@ public class MessageInformation {
 
         var timeout = TimeSpan.FromMinutes(config.SpamTimeoutMinutes);
         
+        var settings = Data.TryGetServerSettings(message.Guild.Id);
+        
         var author = message.Author;
         var timedOut = false;
         try {
@@ -54,13 +56,18 @@ public class MessageInformation {
                         timedOut = true;
                     }))
                 .Append(author.SendMessageAsync(
-                    $"You have been timed out in {message.Guild.Name} for spam. If you believe this has been a mistake please contact `saalvage`."))
+                    $"You have been timed out in {message.Guild.Name} for spam."
+                    + (!string.IsNullOrEmpty(settings?.AppealRecipient)
+                        ? $" If you believe this has been a mistake please contact `{Volatile.Read(ref settings.AppealRecipient)}`."
+                        : "")))
             );
         } catch { /* Messages already deleted, or not authorized to time out this user. */ }
 
         _messages.Clear();
-        if (config.LogChannelsPerServer.TryGetValue(message.Guild.Id, out var logChannelId)) {
-            var msg = timedOut? $"Timed out user {author.Mention} for {timeout} for triggering the spam protection."
+        if (settings == null) { return; }
+        var channelId = Volatile.Read(ref settings.LogChannelId);
+        if (channelId != 0) {
+            var msg = true ? $"Timed out user {author.Mention} until <t:{(DateTimeOffset.UtcNow + timeout).ToUnixTimeMilliseconds() / 1000}:R> for triggering the spam protection."
                 : $"Failed to time out user {author.Mention} for triggering the spam protection.";
             msg += message.Content.Length > 0
                 ? $" The sent message was:\n```\n{message.Content.Replace('`', '´')}\n```"
@@ -68,7 +75,7 @@ public class MessageInformation {
             if (message.Attachments.Count > 0) {
                 msg += "with the following attachments:\n" + string.Join("\n", message.Attachments.Select(x => x.Url));
             }
-            await message.Channel.Guild.GetChannel(logChannelId)
+            await message.Channel.Guild.GetChannel(channelId)
                 .SendMessageAsync(msg);
         }
     }
